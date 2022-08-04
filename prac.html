@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+        integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            width: 1200px;
+        }
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            border: 5px solid green;
+            margin: 5px;
+        }
+
+        .image {
+            width: 200px;
+            height: 200px;
+            border-width: 1px;
+            border-style: solid;
+        }
+    </style>
+    <script>
+        $(document).ready(() => {
+            $.getJSON("data.json", (dt) => {
+                for (let i = 0; i < dt.Listing.details.files.length; i++) {
+                    let item = dt.Listing.details.files[i];
+                    let img = document.createElement('img');
+                    img.src = item.name;
+                    img.className = 'image';
+                    img.id = 'img_' + i;
+
+                    let card = document.createElement('div');
+                    card.id = "card_" + i;
+                    card.className = 'card';
+
+                    if (item.category == 'bad') {
+                        img.style.borderColor = "red";
+                        card.style.borderColor = "red";
+                    }
+                    else if (item.category == 'good') {
+                        img.style.borderColor = "green";
+                        card.style.borderColor = "green";
+                    }
+                    else {
+                        img.style.borderColor = "blue";
+                        card.style.borderColor = "blue";
+                    }
+                    card.append(img);
+
+                    let radioPanel = document.createElement('div');
+                    let radioCategory = ['bad', 'good', 'badOther'];
+                    let isRadioCheckedYet = false;
+                    radioCategory.forEach((element, index) => {
+                        /* create a radio button */
+                        var rdbt = document.createElement("input");
+                        rdbt.setAttribute("type", "radio");
+
+                        /*Set id of new created radio button*/
+                        rdbt.setAttribute("id", "rdbtId_" + i + "_" + index);
+                        rdbt.setAttribute("value", element);
+
+                        /*set unique group name for pair of Yes / No */
+                        rdbt.setAttribute("name", "groupId_" + i);
+                        if (element == item.category) {
+                            rdbt.checked = true;
+                            isRadioCheckedYet = true;
+                        }
+                        else if (!isRadioCheckedYet && index == radioCategory.length - 1) {
+                            rdbt.checked = true;
+                            isRadioCheckedYet = true;
+                        }
+                        /*creating label for Text to Radio button*/
+                        var rdbtLbl = document.createElement("lable");
+
+                        /*create text node for label Text which display for Radio button*/
+                        var rdbtText = document.createTextNode(element);
+
+                        /*add text to new create lable*/
+                        rdbtLbl.appendChild(rdbtText);
+
+                        /*add radio button to Div*/
+                        radioPanel.appendChild(rdbt);
+
+                        /*add label text for radio button to Div*/
+                        radioPanel.appendChild(rdbtLbl);
+                    });
+
+                    card.append(radioPanel);
+                    document.getElementById("mainContainer").append(card);
+                }
+            });
+
+            $("#mainContainer").on("click", "input[type='radio']", function (event) {
+                let grpName = event.target.name;
+                let seqNumArr = grpName.split('_');
+                let seqNum = seqNumArr[seqNumArr.length - 1];
+                debugger;
+                let card = document.getElementById("card_" + seqNum);
+                let img = document.getElementById("img_" + seqNum);
+
+                if (event.target.value == 'bad') {
+                    img.style.borderColor = "red";
+                    card.style.borderColor = "red";
+                }
+                else if (event.target.value == 'good') {
+                    img.style.borderColor = "green";
+                    card.style.borderColor = "green";
+                }
+                else {
+                    img.style.borderColor = "blue";
+                    card.style.borderColor = "blue";
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <h1>Demo</h1>
+    <div class="container" id="mainContainer">
+    </div>
+</body>
+
+</html>
